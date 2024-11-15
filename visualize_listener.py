@@ -100,16 +100,16 @@ if __name__ == "__main__":
     if len(fname_pairs) == 0:
         for i, datum in enumerate(segments):
             fname_pairs.append((datum['fname'], datum['split_start_frame']))
-    audio_fname_map = {}
-    for root, dirs, files in os.walk(args.audio_root+'/'):
-        for fname in files:
-            if fname[-4:] in {'.mp3', '.wav'}:
-                audio_fname_map[fname.split('.')[0]] = root.split(args.audio_root+'/')[1]
-    video_fname_map = {}
-    for root, dirs, files in os.walk(args.video_root+'/'):
-        for fname in files:
-            if fname[-4:] in {'.mp4'}:
-                video_fname_map[fname.split('.')[0]] = root.split(args.video_root+'/')[1]
+    # audio_fname_map = {}
+    # for root, dirs, files in os.walk(args.audio_root+'/'):
+    #     for fname in files:
+    #         if fname[-4:] in {'.mp3', '.wav'}:
+    #             audio_fname_map[fname.split('.')[0]] = root.split(args.audio_root+'/')[1]
+    # video_fname_map = {}
+    # for root, dirs, files in os.walk(args.video_root+'/'):
+    #     for fname in files:
+    #         if fname[-4:] in {'.mp4'}:
+    #             video_fname_map[fname.split('.')[0]] = root.split(args.video_root+'/')[1]
     os.system('mkdir '+args.tmp_dir)
     for path, start_frame in tqdm(fname_pairs):
         fname = path.split('/')[-1]
@@ -225,6 +225,7 @@ if __name__ == "__main__":
             subprocess.call('ffmpeg -y -ss '+str(start_time)+' -t '+str(interval)+' -i '+audio_path+' '+args.tmp_dir+'/audio.wav', shell=True)
             cmd = "ffmpeg -y -r "+str(args.fps)+f" -start_number 0 -i "+args.tmp_dir+"/%8d.jpg -i "+args.tmp_dir+f"/audio.wav -pix_fmt yuv420p -vframes {num_frames} "+os.path.join(args.output_dir, fname+'_'+str(start_frame))+'.mp4'
         else:
-            cmd = "ffmpeg -y -r "+str(args.fps)+f" -start_number 0 -i "+args.tmp_dir+"/%8d.jpg -pix_fmt yuv420p -vframes {num_frames} "+os.path.join(args.output_dir, fname+'_'+str(start_frame))+'.mp4'
+            ffmpeg = '/vision/vision_data_2/VGGSound_shards_fixed/shrinidhi/conda/envs/lm_listener/bin/ffmpeg'
+            cmd = ffmpeg + " -y -r "+str(args.fps)+f" -start_number 0 -i "+args.tmp_dir+f"/%8d.jpg -pix_fmt yuv420p -vframes {num_frames} "+os.path.join(args.output_dir, fname+'_'+str(start_frame))+'.mp4'
         subprocess.call(cmd, shell=True)
         os.system('rm -rf '+args.tmp_dir+'/*')
